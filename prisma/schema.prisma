@@ -18,76 +18,98 @@ model Example {
 }
 
 model User {
-  id        String   @id @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
-  email             String         @unique
-  nickName          String
-  phoneNumber       String
-  password          String
+  email       String @unique
+  nickName    String
+  phoneNumber String
+  password    String
+
+  role            Role
+  notifications   Notification[]
+  receivedReviews Review[]       @relation("owner")
+  writtenReviews  Review[]       @relation("writer")
+  followers       Follow[]       @relation("maker")
+  followees       Follow[]       @relation("dreamer")
+  quotes          Quote[]
+  plans           Plan[]         @relation("isFinal") // 메이커입장: 내가 수행하고 있는, 완료한 플랜 + 지정플랜
+  assignPlans     Plan[]         @relation("isAssign")
+
+  dreamerProfile DreamerProfile?
+  makerProfile   MakerProfile?
+}
+
+model DreamerProfile {
+  createdAt   DateTime
+  updatedAt   DateTime
+  isDeletedAt DateTime?
+  tripTypes   TripType[]
+  image       ProfileImage
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String       @unique
+}
+
+model MakerProfile {
+  createdAt         DateTime
+  updatedAt         DateTime
+  isDeletedAt       DateTime?
   image             ProfileImage
-  tripType          TripType? //드리머용 프로필 MBTI
-  serviceType       TripType? //메이커용 트립타입
-  serviceArea       ServiceArea?
-  gallery           String?
-  description       String?
-  detailDescription String?
-  role              Role
-  messages          Message[]
-  chats             Chat[]
-  nofitications     Nofitication[]
-  receivedReviews   Review[]       @relation("owner")
-  writtenReviews    Review[]       @relation("writer")
-  followers         Follow[]       @relation("maker")
-  followees         Follow[]       @relation("dreamer")
-  quotes            Quote[]
-  plans             Plan[]         @relation("isFinal") // 메이커입장: 내가 수행하고 있는, 완료한 플랜 + 지정플랜
-  assignPlans       Plan[]         @relation("isAssign")
+  serviceTypes      TripType[] //메이커용 트립타입
+  serviceArea       ServiceArea //메이커용 서비스 지역
+  gallery           String
+  description       String
+  detailDescription String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String       @unique
 }
 
 model Review {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
   writer   User?   @relation("writer", fields: [writerId], references: [id])
-  writerId String?
+  writerId String? //연결이 아닌 string으로 받을지 고민
   owner    User?   @relation("owner", fields: [ownerId], references: [id])
   ownerId  String?
 
   rating  Int
   content String
   plan    Plan   @relation(fields: [planId], references: [id])
-  planId  String
+  planId  String @unique
 }
 
 model Chat {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
-  users    User[]
+  users    String[]
   messages Message[]
 }
 
 model Message {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime
+  updatedAt   DateTime
+  isDeletedAt DateTime?
 
   senderId String?
-  sender   User?   @relation(fields: [senderId], references: [id], onDelete: SetNull)
-
-  chatId  String
-  chat    Chat   @relation(fields: [chatId], references: [id])
-  content String
+  chatId   String
+  chat     Chat    @relation(fields: [chatId], references: [id])
+  content  String
 }
 
-model Nofitication {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Notification {
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
   user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId  String?
@@ -96,9 +118,10 @@ model Nofitication {
 }
 
 model Follow {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
   maker     User?   @relation("maker", fields: [makerId], references: [id], onDelete: SetNull)
   makerId   String?
@@ -107,26 +130,29 @@ model Follow {
 }
 
 model Plan {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
   schedule    DateTime[]
   tripType    TripType
+  serviceArea ServiceArea
+  details     String
+  address     String?
+  status      Status
   quotes      Quote[]
-  area        String
-  isConfirmed Boolean    @default(false)
-  isCompleted Boolean    @default(false)
-  assignees   User[]     @relation("isAssign")
-  dreamer     User?      @relation("isFinal", fields: [dreamerId], references: [id], onDelete: SetNull)
+  assignees   User[]      @relation("isAssign")
+  dreamer     User?       @relation("isFinal", fields: [dreamerId], references: [id], onDelete: SetNull)
   dreamerId   String?
-  reviews     Review[]
+  Review      Review?
 }
 
 model Quote {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeletedAt DateTime?
 
   price       Int
   content     String
@@ -177,4 +203,10 @@ enum ServiceArea {
 enum Role {
   DREAMER
   MAKER
+}
+
+enum Status {
+  PENDING
+  CONFIRMED
+  COMPLETED
 }
