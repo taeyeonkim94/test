@@ -47,9 +47,10 @@ model DreamerProfile {
   updatedAt   DateTime
   isDeletedAt DateTime?
   tripTypes   TripType[]
+  serviceArea ServiceArea[]
   image       ProfileImage
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String       @unique
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String        @unique
 }
 
 model MakerProfile {
@@ -58,12 +59,12 @@ model MakerProfile {
   isDeletedAt       DateTime?
   image             ProfileImage
   serviceTypes      TripType[] //메이커용 트립타입
-  serviceArea       ServiceArea //메이커용 서비스 지역
+  serviceArea       ServiceArea[] //메이커용 서비스 지역
   gallery           String
   description       String
   detailDescription String
-  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String       @unique
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String        @unique
 }
 
 model Review {

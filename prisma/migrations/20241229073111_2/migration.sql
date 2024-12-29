@@ -10,25 +10,52 @@ CREATE TYPE "ServiceArea" AS ENUM ('SEOUL', 'BUSAN', 'INCHEON', 'DAEGU', 'DAEJEO
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('DREAMER', 'MAKER');
 
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED');
+
+-- CreateTable
+CREATE TABLE "Example" (
+    "id" TEXT NOT NULL
+);
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "email" TEXT NOT NULL,
     "nickName" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "image" "ProfileImage" NOT NULL,
-    "tripType" "TripType",
-    "serviceType" "TripType",
-    "serviceArea" "ServiceArea",
-    "gallery" TEXT,
-    "description" TEXT,
-    "detailDescription" TEXT,
     "role" "Role" NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "DreamerProfile" (
+    "createdAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
+    "tripTypes" "TripType"[],
+    "serviceArea" "ServiceArea"[],
+    "image" "ProfileImage" NOT NULL,
+    "userId" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "MakerProfile" (
+    "createdAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
+    "image" "ProfileImage" NOT NULL,
+    "serviceTypes" "TripType"[],
+    "serviceArea" "ServiceArea"[],
+    "gallery" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "detailDescription" TEXT NOT NULL,
+    "userId" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -36,6 +63,7 @@ CREATE TABLE "Review" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "writerId" TEXT,
     "ownerId" TEXT,
     "rating" INTEGER NOT NULL,
@@ -50,6 +78,8 @@ CREATE TABLE "Chat" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
+    "users" TEXT[],
 
     CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
 );
@@ -57,8 +87,9 @@ CREATE TABLE "Chat" (
 -- CreateTable
 CREATE TABLE "Message" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "senderId" TEXT,
     "chatId" TEXT NOT NULL,
     "content" TEXT NOT NULL,
@@ -67,15 +98,16 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
-CREATE TABLE "Nofitication" (
+CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "userId" TEXT,
     "content" TEXT NOT NULL,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "Nofitication_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -83,6 +115,7 @@ CREATE TABLE "Follow" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "makerId" TEXT,
     "dreamerId" TEXT,
 
@@ -94,11 +127,13 @@ CREATE TABLE "Plan" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "schedule" TIMESTAMP(3)[],
     "tripType" "TripType" NOT NULL,
-    "area" TEXT NOT NULL,
-    "isConfirmed" BOOLEAN NOT NULL DEFAULT false,
-    "isCompleted" BOOLEAN NOT NULL DEFAULT false,
+    "serviceArea" "ServiceArea" NOT NULL,
+    "details" TEXT NOT NULL,
+    "address" TEXT,
+    "status" "Status" NOT NULL,
     "dreamerId" TEXT,
 
     CONSTRAINT "Plan_pkey" PRIMARY KEY ("id")
@@ -109,6 +144,7 @@ CREATE TABLE "Quote" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeletedAt" TIMESTAMP(3),
     "price" INTEGER NOT NULL,
     "content" TEXT NOT NULL,
     "planId" TEXT NOT NULL,
@@ -120,14 +156,6 @@ CREATE TABLE "Quote" (
 );
 
 -- CreateTable
-CREATE TABLE "_ChatToUser" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
-
-    CONSTRAINT "_ChatToUser_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
 CREATE TABLE "_isAssign" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
@@ -136,16 +164,31 @@ CREATE TABLE "_isAssign" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Example_id_key" ON "Example"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "_ChatToUser_B_index" ON "_ChatToUser"("B");
+CREATE UNIQUE INDEX "DreamerProfile_userId_key" ON "DreamerProfile"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MakerProfile_userId_key" ON "MakerProfile"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_planId_key" ON "Review"("planId");
 
 -- CreateIndex
 CREATE INDEX "_isAssign_B_index" ON "_isAssign"("B");
+
+-- AddForeignKey
+ALTER TABLE "DreamerProfile" ADD CONSTRAINT "DreamerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MakerProfile" ADD CONSTRAINT "MakerProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_writerId_fkey" FOREIGN KEY ("writerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -157,13 +200,10 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_ownerId_fkey" FOREIGN KEY ("ownerId"
 ALTER TABLE "Review" ADD CONSTRAINT "Review_planId_fkey" FOREIGN KEY ("planId") REFERENCES "Plan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "Chat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Nofitication" ADD CONSTRAINT "Nofitication_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Follow" ADD CONSTRAINT "Follow_makerId_fkey" FOREIGN KEY ("makerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -179,12 +219,6 @@ ALTER TABLE "Quote" ADD CONSTRAINT "Quote_planId_fkey" FOREIGN KEY ("planId") RE
 
 -- AddForeignKey
 ALTER TABLE "Quote" ADD CONSTRAINT "Quote_makerId_fkey" FOREIGN KEY ("makerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ChatToUser" ADD CONSTRAINT "_ChatToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Chat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ChatToUser" ADD CONSTRAINT "_ChatToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_isAssign" ADD CONSTRAINT "_isAssign_A_fkey" FOREIGN KEY ("A") REFERENCES "Plan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
