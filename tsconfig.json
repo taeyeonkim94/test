@@ -21,7 +21,8 @@
   "include": [
     "src/**/*", // src 폴더의 모든 파일 포함
     "prisma/**/*",
-    "test/**/*"
+    "test/**/*",
+    "config"
   ],
   "exclude": [
     "dist/**/*" // dist 폴더의 모든 파일 제외
