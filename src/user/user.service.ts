@@ -5,7 +5,7 @@ import ErrorMessage from 'src/common/enums/error.message';
 import User from './domain/user.domain';
 import { JwtService } from '@nestjs/jwt';
 import { DreamerProfile, MakerProfile } from './domain/profile.domain';
-import { UserProperties } from './type/user.types';
+import { FilteredUserProperties, UserProperties } from './type/user.types';
 import { DreamerProfileProperties, MakerProfileProperties } from './type/profile.types';
 import { IUserService } from './interface/user.service.interface';
 
@@ -34,19 +34,20 @@ export default class UserService implements IUserService {
 
     const userData = await User.create(user);
     const savedUser = await this.repository.create(userData);
+    const newUser = savedUser.get();
 
     // 역할에 따라 프로필 등록
-    if (savedUser.role === 'DREAMER') {
-      const profileData = DreamerProfile.create({ ...profile, userId: savedUser.id });
+    if (newUser.role === 'DREAMER') {
+      const profileData = DreamerProfile.create({ ...profile, userId: newUser.id });
       await this.repository.createDreamer(profileData);
     } else {
-      const profileData = MakerProfile.create({ ...profile, userId: savedUser.id });
+      const profileData = MakerProfile.create({ ...profile, userId: newUser.id });
       await this.repository.createMaker(profileData);
     }
     return;
   }
 
-  async login(email: string, password: string): Promise<Omit<UserProperties, 'password'>> {
+  async login(email: string, password: string): Promise<FilteredUserProperties> {
     const user = await this.repository.findByEmail(email);
     if (!user) {
       throw new BadRequestError(ErrorMessage.USER_UNAUTHORIZED_ID);
@@ -57,13 +58,13 @@ export default class UserService implements IUserService {
       throw new BadRequestError(ErrorMessage.USER_UNAUTHORIZED_PW);
     }
 
-    return user.get();
+    return user.toClient();
   }
 
-  async getUser(userId: string): Promise<Omit<UserProperties, 'password'>> {
+  async getUser(userId: string): Promise<FilteredUserProperties> {
     const user = await this.repository.findById(userId);
 
-    return user.get();
+    return user.toClient();
   }
 
   async getProfile(role: string, userId: string): Promise<DreamerProfileProperties | MakerProfileProperties> {
@@ -88,7 +89,7 @@ export default class UserService implements IUserService {
     return userId;
   }
 
-  async updateUser(userId: string, data: Partial<UserProperties>) {
+  async updateUser(userId: string, data: Partial<UserProperties>): Promise<FilteredUserProperties> {
     const user = await this.repository.findById(userId);
     if (!user) {
       throw new BadRequestError(ErrorMessage.USER_NOT_FOUND);
@@ -96,7 +97,7 @@ export default class UserService implements IUserService {
 
     user.update(data);
     await this.repository.update(userId, user);
-    return user.get();
+    return user.toClient();
   }
 
   async updateDreamerProfile(
@@ -109,7 +110,7 @@ export default class UserService implements IUserService {
     }
 
     profile.update(data);
-    await this.repository.updateDreamerProfile(userId, profile);
+    await this.repository.updateDreamerProfile(userId, profile.get());
     return profile.get();
   }
 
@@ -120,7 +121,7 @@ export default class UserService implements IUserService {
     }
 
     profile.update(data);
-    await this.repository.updateMakerProfile(userId, profile);
+    await this.repository.updateMakerProfile(userId, profile.get());
     return profile.get();
   }
 }

@@ -4,9 +4,10 @@ import ExampleModule from './example/example.module';
 import UserModule from './user/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './guard/login.guard';
+import FollowModule from './follow/follow.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), ExampleModule, UserModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), ExampleModule, UserModule, FollowModule],
   controllers: [],
   providers: [
     {

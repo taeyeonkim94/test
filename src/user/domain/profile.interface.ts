@@ -2,10 +2,10 @@ import { DreamerProfileProperties, MakerProfileProperties } from '../type/profil
 
 export interface IDreamerProfile {
   update(data: Partial<DreamerProfileProperties>): void;
-  get(): Partial<DreamerProfileProperties>;
+  get(): DreamerProfileProperties;
 }
 
 export interface IMakerProfile {
   update(data: Partial<MakerProfileProperties>): void;
-  get(): Partial<MakerProfileProperties>;
+  get(): MakerProfileProperties;
 }

@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import DBClient from 'prisma/DB.client';
 import UserMapper from './domain/user.mapper';
-import User from './domain/user.domain';
 import { UserProperties } from './type/user.types';
 import { DreamerProfileProperties, MakerProfileProperties } from './type/profile.types';
 import { DreamerProfileMapper, MakerProfileMapper } from './domain/profile.mapper';
-import { DreamerProfile, MakerProfile } from './domain/profile.domain';
 import IUserRepository from './interface/user.repository.interface';
+import { IUser } from './domain/user.interface';
+import { IDreamerProfile, IMakerProfile } from './domain/profile.interface';
+import User from './domain/user.domain';
 
 @Injectable()
 export default class UserRepository implements IUserRepository {
   constructor(private readonly db: DBClient) {}
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<IUser> {
     const data = await this.db.user.findUnique({
       where: {
         email
@@ -24,7 +25,7 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  async findByNickName(nickName: string): Promise<User> {
+  async findByNickName(nickName: string): Promise<IUser> {
     const data = await this.db.user.findUnique({
       where: {
         nickName
@@ -48,8 +49,8 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  async create(user: Partial<UserProperties>): Promise<UserProperties> {
-    return await this.db.user.create({
+  async create(user: Partial<UserProperties>): Promise<IUser> {
+    const data = await this.db.user.create({
       data: {
         role: user.role,
         email: user.email,
@@ -58,6 +59,8 @@ export default class UserRepository implements IUserRepository {
         phoneNumber: user.phoneNumber
       }
     });
+
+    return new UserMapper(data).toDomain();
   }
 
   async update(id: string, data: Partial<UserProperties>): Promise<null> {
@@ -71,8 +74,8 @@ export default class UserRepository implements IUserRepository {
     return;
   }
 
-  async createDreamer(user: Partial<DreamerProfileProperties>): Promise<DreamerProfileProperties> {
-    return await this.db.dreamerProfile.create({
+  async createDreamer(user: Partial<DreamerProfileProperties>): Promise<IDreamerProfile> {
+    const profile = await this.db.dreamerProfile.create({
       data: {
         user: { connect: { id: user.userId } },
         tripTypes: user.tripTypes,
@@ -80,10 +83,12 @@ export default class UserRepository implements IUserRepository {
         image: user.image
       }
     });
+
+    return new DreamerProfileMapper(profile).toDomain();
   }
 
-  async createMaker(user: Partial<MakerProfileProperties>): Promise<MakerProfileProperties> {
-    return await this.db.makerProfile.create({
+  async createMaker(user: Partial<MakerProfileProperties>): Promise<IMakerProfile> {
+    const profile = await this.db.makerProfile.create({
       data: {
         user: { connect: { id: user.userId } },
         serviceArea: user.serviceArea,
@@ -94,9 +99,11 @@ export default class UserRepository implements IUserRepository {
         image: user.image
       }
     });
+
+    return new MakerProfileMapper(profile).toDomain();
   }
 
-  async findDreamerProfile(userId: string): Promise<DreamerProfile> {
+  async findDreamerProfile(userId: string): Promise<IDreamerProfile> {
     const data = await this.db.dreamerProfile.findUnique({
       where: {
         userId
@@ -108,7 +115,7 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  async findMakerProfile(userId: string): Promise<MakerProfile> {
+  async findMakerProfile(userId: string): Promise<IMakerProfile> {
     const data = await this.db.makerProfile.findUnique({
       where: {
         userId
@@ -131,7 +138,7 @@ export default class UserRepository implements IUserRepository {
     return;
   }
 
-  async updateMakerProfile(userId: string, data: Partial<MakerProfileProperties>): Promise<null> {
+  async updateMakerProfile(userId: string, data: Partial<MakerProfileProperties>) {
     await this.db.makerProfile.update({
       where: {
         userId

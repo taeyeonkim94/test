@@ -1,6 +1,8 @@
-import { ProfileImage, ServiceArea, TripType } from '@prisma/client';
 import { DreamerProfileProperties, MakerProfileProperties } from '../type/profile.types';
 import { IDreamerProfile, IMakerProfile } from './profile.interface';
+import { ProfileImage } from 'src/common/types/image.type';
+import { ServiceArea } from 'src/common/types/serviceArea.type';
+import { TripType } from 'src/common/types/tripType.type';
 
 export class DreamerProfile implements IDreamerProfile {
   userId?: string;

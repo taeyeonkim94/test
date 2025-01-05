@@ -1,7 +1,8 @@
-import { UserProperties } from '../type/user.types';
+import { FilteredUserProperties, UserProperties } from '../type/user.types';
 
 export interface IUser {
   validatePassword(password: string): Promise<boolean>;
   update(data: Partial<UserProperties>): void;
-  get(): Omit<UserProperties, 'password'>;
+  get(): UserProperties;
+  toClient(): FilteredUserProperties;
 }

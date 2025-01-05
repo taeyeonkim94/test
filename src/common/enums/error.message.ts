@@ -9,6 +9,9 @@ const enum ErrorMessage {
   TOKEN_UNAUTHORIZED_NOTFOUND = '토큰이 없습니다. 로그인이 필요합니다',
   TOKEN_UNAUTHORIZED_VALIDATION = '유효하지 않은 토큰입니다',
 
+  FOLLOW_EXIST = '이미 팔로우한 유저입니다',
+  FOLLOW_NOT_FOUND = '팔로우하지 않은 유저입니다',
+
   PRODUCT_NOT_FOUND = '해당 상품을 찾을 수 없습니다.',
   PRODUCT_FORBIDDEN = '해당 게시글을 삭제할 권리가 없습니다.',
 

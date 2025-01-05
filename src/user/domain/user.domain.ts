@@ -1,12 +1,13 @@
-import { UserProperties } from '../type/user.types';
+import { Role } from 'src/common/types/role.type';
+import { FilteredUserProperties, UserProperties } from '../type/user.types';
 import { ComparePassword, HashingPassword } from '../utility/hashingPassword';
 import { IUser } from './user.interface';
 
 export default class User implements IUser {
   readonly id?: string;
-  role: 'DREAMER' | 'MAKER';
+  readonly role: Role;
   nickName: string;
-  email: string;
+  readonly email: string;
   password: string;
   phoneNumber: string;
   readonly createdAt?: Date;
@@ -33,22 +34,29 @@ export default class User implements IUser {
   }
 
   update(data: Partial<UserProperties>): void {
-    this.role = data.role || this.role;
     this.nickName = data.nickName || this.nickName;
-    this.email = data.email || this.email;
     this.password = data.email || this.password;
     this.phoneNumber = data.phoneNumber || this.phoneNumber;
   }
 
-  get() {
+  get(): UserProperties {
     return {
       id: this.id,
       role: this.role,
       nickName: this.nickName,
       email: this.email,
+      password: this.password,
       phoneNumber: this.phoneNumber,
-      createAt: this.createdAt,
-      updateAt: this.updatedAt
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
+    };
+  }
+
+  toClient(): FilteredUserProperties {
+    return {
+      id: this.id,
+      role: this.role,
+      nickName: this.nickName
     };
   }
 }

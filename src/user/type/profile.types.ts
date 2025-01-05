@@ -9,12 +9,12 @@ export interface BaseProfile {
 }
 
 export interface DreamerProfileProperties extends BaseProfile {
-  tripTypes?: TripType[]; // Dreamer
+  tripTypes: TripType[]; // Dreamer
 }
 
 export interface MakerProfileProperties extends BaseProfile {
-  serviceTypes?: TripType[];
-  gallery?: string;
-  description?: string;
-  detailDescription?: string;
+  serviceTypes: TripType[];
+  gallery: string;
+  description: string;
+  detailDescription: string;
 }
