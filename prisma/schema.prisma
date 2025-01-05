@@ -24,7 +24,7 @@ model User {
   isDeletedAt DateTime?
 
   email       String @unique
-  nickName    String
+  nickName    String @unique
   phoneNumber String
   password    String
 
@@ -43,8 +43,8 @@ model User {
 }
 
 model DreamerProfile {
-  createdAt   DateTime
-  updatedAt   DateTime
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   isDeletedAt DateTime?
   tripTypes   TripType[]
   serviceArea ServiceArea[]
@@ -54,8 +54,8 @@ model DreamerProfile {
 }
 
 model MakerProfile {
-  createdAt         DateTime
-  updatedAt         DateTime
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
   isDeletedAt       DateTime?
   image             ProfileImage
   serviceTypes      TripType[] //메이커용 트립타입
@@ -192,8 +192,8 @@ enum ServiceArea {
   SEJONG
   GYEONGGI
   GANGWON
-  CHAUNGBUK
-  CHAUNGNAM
+  CHUNGBUK // 오타 수정
+  CHUNGNAM
   JEONBUK
   JEONNAM
   GYEONGBUK

@@ -1,11 +1,11 @@
 -- CreateEnum
-CREATE TYPE "ProfileImage" AS ENUM ('A', 'B', 'C', 'D');
+CREATE TYPE "ProfileImage" AS ENUM ('DEFAULT_1', 'DEFAULT_2', 'DEFAULT_3', 'DEFAULT_4');
 
 -- CreateEnum
 CREATE TYPE "TripType" AS ENUM ('FOOD_TOUR', 'SHOPPING', 'RELAXATION', 'CULTURE', 'ACTIVITY', 'FESTIVAL');
 
 -- CreateEnum
-CREATE TYPE "ServiceArea" AS ENUM ('SEOUL', 'BUSAN', 'INCHEON', 'DAEGU', 'DAEJEON', 'GWANGJU', 'ULSAN', 'SEJONG', 'GYEONGGI', 'GANGWON', 'CHAUNGBUK', 'CHAUNGNAM', 'JEONBUK', 'JEONNAM', 'GYEONGBUK', 'GYEONGNAM', 'JEJU');
+CREATE TYPE "ServiceArea" AS ENUM ('SEOUL', 'BUSAN', 'INCHEON', 'DAEGU', 'DAEJEON', 'GWANGJU', 'ULSAN', 'SEJONG', 'GYEONGGI', 'GANGWON', 'CHUNGBUK', 'CHUNGNAM', 'JEONBUK', 'JEONNAM', 'GYEONGBUK', 'GYEONGNAM', 'JEJU');
 
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('DREAMER', 'MAKER');
@@ -35,7 +35,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "DreamerProfile" (
-    "createdAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDeletedAt" TIMESTAMP(3),
     "tripTypes" "TripType"[],
@@ -46,7 +46,7 @@ CREATE TABLE "DreamerProfile" (
 
 -- CreateTable
 CREATE TABLE "MakerProfile" (
-    "createdAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDeletedAt" TIMESTAMP(3),
     "image" "ProfileImage" NOT NULL,
@@ -167,10 +167,10 @@ CREATE TABLE "_isAssign" (
 CREATE UNIQUE INDEX "Example_id_key" ON "Example"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_nickName_key" ON "User"("nickName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "DreamerProfile_userId_key" ON "DreamerProfile"("userId");
