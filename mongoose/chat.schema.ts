@@ -1,30 +1,26 @@
-// import 'reflect-metadata';
-// import { Prop, Schema } from '@nestjs/mongoose';
-// import { Document, HydratedDocument } from 'mongoose';
-// export type CatDocument = HydratedDocument<Chat>;
-
-// @Schema({
-//   timestamps: true
-// })
-// export class Chat {
-//   @Prop()
-//   name: string;
-// }
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-export type CatDocument = HydratedDocument<Cat>;
+export type ChatDocument = HydratedDocument<Chat>;
 
-@Schema()
-export class Cat {
-  @Prop()
+@Schema({ timestamps: true })
+class Chat {
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
-  age: number;
+  @Prop({ default: null })
+  isDeletedAt: Date | null;
 
-  @Prop()
-  breed: string;
+  @Prop({ type: [String] })
+  userIds: string[];
+
+  @Prop({
+    type: [Types.ObjectId],
+    required: true,
+    ref: 'Message'
+  })
+  messageIds: Types.ObjectId[];
 }
 
-export const CatSchema = SchemaFactory.createForClass(Cat);
+const ChatSchema = SchemaFactory.createForClass(Chat);
+export default ChatSchema;

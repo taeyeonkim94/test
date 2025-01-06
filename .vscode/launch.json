@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Nest Framework",
+      "runtimeExecutable": "npm", // pnpm에서 npm으로 변경
+      "runtimeArgs": [
+        "run",
+        "start:debug", // 기존 유지
+        "--", // 기존 유지
+        "--inspect-brk" // 기존 유지
+      ],
+      "autoAttachChildProcesses": true,
+      "restart": true,
+      "sourceMaps": true,
+      "stopOnEntry": false,
+      "console": "integratedTerminal"
+    }
+  ]
+}

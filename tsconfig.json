@@ -22,7 +22,8 @@
     "src/**/*", // src 폴더의 모든 파일 포함
     "prisma/**/*",
     "test/**/*",
-    "config"
+    "config",
+    "mongoose/**/*"
   ],
   "exclude": [
     "dist/**/*" // dist 폴더의 모든 파일 제외

@@ -136,7 +136,8 @@ model Plan {
   updatedAt   DateTime  @updatedAt
   isDeletedAt DateTime?
 
-  schedule    DateTime[]
+  startDate   DateTime
+  endDate     DateTime
   tripType    TripType
   serviceArea ServiceArea
   details     String
@@ -146,7 +147,7 @@ model Plan {
   assignees   User[]      @relation("isAssign")
   dreamer     User?       @relation("isFinal", fields: [dreamerId], references: [id], onDelete: SetNull)
   dreamerId   String?
-  Review      Review?
+  review      Review?
 }
 
 model Quote {
